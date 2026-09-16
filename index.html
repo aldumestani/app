@@ -1,0 +1,137 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>{"appName":"Edusis.bh","play":"https://play.google.com/store/apps/details?id=bh.gov.moe.edusis&hl=en","ios":"https://apps.apple.com/bh/app/edusis-bh/id6479628751","ms":"","web":"","mac":""} — حمّل التطبيق</title>
+<style>
+:root{
+  --bg0:#0f172a; --bg1:#1e293b; --fg:#f1f5f9; --muted:#94a3b8;
+  --acc:#38bdf8; --acc2:#6366f1; --play:#34d399; --apple:#a78bfa;
+  --ms:#facc15; --web:#fb7185;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{
+  font-family:"Segoe UI",Tahoma,system-ui,Arial,sans-serif;
+  min-height:100vh;display:flex;align-items:center;justify-content:center;
+  background:radial-gradient(1200px 700px at 80% -10%, #1e3a5f 0%, transparent 55%),
+             radial-gradient(900px 600px at 10% 110%, #312e81 0%, transparent 55%),
+             var(--bg0);
+  color:var(--fg);padding:24px;
+}
+.card{
+  width:100%;max-width:460px;background:rgba(30,41,59,.72);
+  border:1px solid rgba(148,163,184,.18);border-radius:20px;
+  padding:32px 28px;backdrop-filter:blur(10px);
+  box-shadow:0 24px 60px rgba(0,0,0,.45);text-align:center;
+}
+.badge{
+  display:inline-flex;gap:8px;align-items:center;
+  font-size:12px;color:var(--acc);letter-spacing:.5px;
+  background:rgba(56,189,248,.12);border:1px solid rgba(56,189,248,.3);
+  padding:6px 14px;border-radius:99px;margin-bottom:18px;
+}
+h1{font-size:26px;margin-bottom:8px}
+.sub{color:var(--muted);font-size:14px;line-height:1.8;margin-bottom:26px}
+.timer{
+  font-size:13px;color:var(--muted);margin-bottom:22px;min-height:20px;
+}
+.skip{color:var(--acc);cursor:pointer;text-decoration:underline dotted}
+.store{display:flex;gap:12px;flex-direction:column}
+.store a{
+  display:flex;align-items:center;gap:12px;text-decoration:none;
+  padding:14px 16px;border-radius:14px;background:var(--bg1);
+  border:1px solid rgba(148,163,184,.2);color:var(--fg);
+  transition:transform .15s ease,border-color .15s ease;
+}
+.store a:hover{transform:translateY(-2px)}
+.store a span{flex:1;text-align:right;font-size:15px;font-weight:600}
+.icon{width:34px;height:34px;border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:18px}
+.i-play{background:linear-gradient(135deg,#22c55e,#16a34a)}
+.i-apple{background:linear-gradient(135deg,#a855f7,#7c3aed)}
+.i-ms{background:linear-gradient(135deg,#eab308,#ca8a04)}
+.i-web{background:linear-gradient(135deg,#f43f5e,#e11d48)}
+.note{margin-top:22px;font-size:12px;color:var(--muted)}
+</style>
+</head>
+<body>
+<div class="card">
+  <div class="badge">◈ تحميل آمن وموثوق</div>
+  <h1 id="appName">تطبيقي</h1>
+  <p class="sub">حمّل التطبيق من المتجر المناسب لجهازك — تم توجيهك تلقائياً إلى المتجر الصحيح.</p>
+  <div class="timer" id="timer"></div>
+  <div class="store" id="stores"></div>
+  <p class="note">إذا لم يُفتح المتجر تلقائياً، اختر متجرك من الأزرار أعلاه.</p>
+</div>
+<script>
+(function(){
+  var links = window.APP_DATA || {};
+  var q = new URLSearchParams(location.search);
+  var appNameEl = document.getElementById('appName');
+
+  function get(name, def){ return q.get(name) || links[name] || def || ''; }
+
+  var data = {
+    appName: get('appName', links.appName || 'تطبيقي'),
+    play: get('play'),
+    ios: get('ios'),
+    ms: get('ms'),
+    web: get('web'),
+    mac: get('mac')
+  };
+  document.title = data.appName + ' — حمّل التطبيق';
+  appNameEl.textContent = data.appName;
+
+  function detect(){
+    var ua = navigator.userAgent;
+    if (/ipad|iphone|ipod/i.test(ua) && !window.MSStream) return 'ios';
+    if (/android/i.test(ua)) return 'play';
+    if (/windows/i.test(ua)) return 'ms';
+    if (/mac|ipad/i.test(ua)) return 'mac';
+    if (/linux/i.test(ua)) return 'web';
+    return null;
+  }
+
+  var items = [];
+  if (data.play)  items.push({ key:'play', label:'متجر Google Play',   href:data.play,  cls:'i-play' , icon:'G'});
+  if (data.ios)   items.push({ key:'ios',  label:'App Store (أبل)',    href:data.ios,   cls:'i-apple', icon:'A'});
+  if (data.ms)    items.push({ key:'ms',   label:'Microsoft Store',    href:data.ms,    cls:'i-ms'   , icon:'W'});
+  if (data.mac)   items.push({ key:'mac',  label:'Mac App Store',      href:data.mac,   cls:'i-apple', icon:'M'});
+  if (data.web)   items.push({ key:'web',  label:'الموقع الرسمي',      href:data.web,   cls:'i-web'  , icon:'W'});
+
+  var box = document.getElementById('stores');
+  if (!items.length){
+    box.innerHTML = '<p class="sub" style="margin:0">لم يتم إعداد روابط التحميل بعد.</p>';
+    return;
+  }
+  items.forEach(function(it){
+    var a = document.createElement('a');
+    a.href = it.href;
+    a.target = it.key === 'web' ? '_blank' : '_self';
+    a.rel = 'noopener';
+    a.innerHTML = '<span class="icon '+it.cls+'">'+it.icon+'</span><span>'+it.label+'</span>';
+    box.appendChild(a);
+  });
+
+  var target = q.get('store') || detect();
+  var timerEl = document.getElementById('timer');
+  var count = 3;
+  var redirected = false;
+
+  function go(){
+    if (redirected) return;
+    var it = items.find(function(x){ return x.key === target; });
+    if (it){ redirected = true; timerEl.textContent = 'جاري فتح المتجر…'; location.href = it.href; }
+    else { timerEl.textContent = ''; }
+  }
+
+  var iv = setInterval(function(){
+    count--;
+    if (count <= 0){ clearInterval(iv); go(); }
+    else timerEl.innerHTML = 'يتم التوجيه إلى المتجر المناسب خلال <b>'+count+'</b> ثانية… <span class="skip" onclick="clearInterval('+iv+');document.getElementById(\'timer\').textContent=\'\'">إلغاء</span>';
+  }, 1000);
+  timerEl.innerHTML = 'يتم التوجيه إلى المتجر المناسب خلال <b>3</b> ثانية… <span class="skip" onclick="clearInterval('+iv+');document.getElementById(\'timer\').textContent=\'\'">إلغاء</span>';
+})();
+</script>
+</body>
+</html>
