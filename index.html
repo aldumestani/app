@@ -116,22 +116,17 @@ window.APP_DATA = {"appName":"Edusis.bh","play":"https://play.google.com/store/a
 
   var target = q.get('store') || detect();
   var timerEl = document.getElementById('timer');
-  var count = 3;
   var redirected = false;
 
   function go(){
     if (redirected) return;
     var it = items.find(function(x){ return x.key === target; });
-    if (it){ redirected = true; timerEl.textContent = 'جاري فتح المتجر…'; location.href = it.href; }
-    else { timerEl.textContent = ''; }
+    if (it){ redirected = true; timerEl.innerHTML = 'جاري فتح المتجر… <span class="skip" onclick="redirected=true">إلغاء</span>'; location.href = it.href; }
   }
 
-  var iv = setInterval(function(){
-    count--;
-    if (count <= 0){ clearInterval(iv); go(); }
-    else timerEl.innerHTML = 'يتم التوجيه إلى المتجر المناسب خلال <b>'+count+'</b> ثانية… <span class="skip" onclick="clearInterval('+iv+');document.getElementById(\'timer\').textContent=\'\'">إلغاء</span>';
-  }, 1000);
-  timerEl.innerHTML = 'يتم التوجيه إلى المتجر المناسب خلال <b>3</b> ثانية… <span class="skip" onclick="clearInterval('+iv+');document.getElementById(\'timer\').textContent=\'\'">إلغاء</span>';
+  var redirected = false;
+  var iv = setInterval(function(){ go(); }, 500);
+  timerEl.innerHTML = 'جاري التوجيه إلى المتجر المناسب… <span class="skip" onclick="clearInterval('+iv+');redirected=true;document.getElementById(\'timer\').textContent=\'\'">إلغاء</span>';
 })();
 </script>
 </body>
